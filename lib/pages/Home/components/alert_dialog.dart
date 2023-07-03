@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:todo/pages/Home/components/my_button.dart';
 
 class AlertDialogBox extends StatelessWidget {
-  final VoidCallback cancel;
-  final VoidCallback save;
-
+  final VoidCallback createTasks;
+  final VoidCallback closeDialog;
   final TextEditingController textController;
 
-  const AlertDialogBox(
-      {Key? key,
-      required this.cancel,
-      required this.save,
-      required this.textController})
-      : super(key: key);
+  const AlertDialogBox({
+    Key? key,
+    required this.createTasks,
+    required this.closeDialog,
+    required this.textController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       content: SizedBox(
-        height: 120,
+        height: 135,
         child: Column(
           children: [
-            // Get user input
+            // Task input
             TextField(
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -40,12 +39,13 @@ class AlertDialogBox extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyButton(onPressed: cancel, text: "Cancel"),
+                MyButton(onPressed: closeDialog, text: "Cancel"),
                 const SizedBox(
                   width: 10,
                 ),
+                
                 MyButton(
-                  onPressed: save,
+                  onPressed: createTasks,
                   text: "Save",
                 )
               ],

@@ -1,43 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:todo/pages/Home/components/alert_dialog.dart';
 import 'package:todo/pages/Home/components/todo_list.dart';
+import 'package:todo/services/task_service.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final TaskService _taskService = TaskService();
+  final TextEditingController _textController = TextEditingController();
+  HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final taskController = TextEditingController();
+  var _tasks = [];
 
-  List taskList = [];
+  @override
+  void initState() {
+    super.initState();
+    _tasks = widget._taskService.getAllTasks();
+  }
 
-  void createTask() {
+  void showCreateTaksAlertDialog() {
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialogBox(
-            cancel: cancelCreateNewTask,
-            save: saveNewTask,
-            textController: taskController,
+            closeDialog: _closeAlertDialog,
+            createTasks: _createTask,
+            textController: widget._textController,
           );
         });
-    taskController.clear();
   }
 
-  void saveNewTask() {
-    if (taskController.value.text.isNotEmpty) {
-      setState(() {
-        taskList.add([taskController.text, false]);
-      });
-      Navigator.of(context).pop();
+  _createTask() {
+    var inputIsEmpty = widget._textController.value.text.isEmpty;
+    if (inputIsEmpty) {
+      return;
     }
+    setState(() {
+      widget._taskService
+          .saveTask({'task': widget._textController.text, 'isComplete': false});
+      _tasks = widget._taskService.getAllTasks();
+      widget._textController.clear();
+      Navigator.pop(context);
+    });
   }
 
-  void cancelCreateNewTask() {
-    Navigator.of(context).pop();
+  _deleteTask(taskIndex) {
+    widget._taskService.deleteTask(taskIndex);
+    setState(() {
+      _tasks = widget._taskService.getAllTasks();
+    });
+  }
+
+  _changeTaskStatus(taskIndex) {
+    widget._taskService.changeTaskStatus(taskIndex);
+    setState(() {
+      _tasks = widget._taskService.getAllTasks();
+    });
+  }
+
+  _closeAlertDialog() {
+    Navigator.pop(context);
   }
 
   @override
@@ -45,14 +70,22 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.yellow[200],
       appBar: AppBar(
-        title: const Text(
-          "TODO",
+        title: const Center(
+          child: Text(
+            "TO DO",
+          ),
         ),
         elevation: 0,
       ),
-      body: taskList.isNotEmpty
-          ? (TodoList(todoList: taskList))
-          : const Center(
+      body: _tasks.isNotEmpty
+          ? // Tasks List
+          (TodoList(
+              tasks: _tasks,
+              deleteTask: _deleteTask,
+              changeTaskStatus: _changeTaskStatus,
+            ))
+          : // Add tasks text
+          const Center(
               child: Text(
               "Clique no botão + para adicionar  uma nova tarefa.",
               style: TextStyle(fontSize: 18),
@@ -60,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               textAlign: TextAlign.center,
             )),
       floatingActionButton: FloatingActionButton(
-        onPressed: createTask,
+        onPressed: showCreateTaksAlertDialog,
         child: const Icon(Icons.add),
       ),
     );

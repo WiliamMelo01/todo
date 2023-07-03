@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/pages/Home/home.dart';
 
-main(){
+Future<void> main()async{
+  await Hive.initFlutter();
+  await Hive.openBox('tasks');
+
   runApp(const App());
 }
 
@@ -12,7 +16,7 @@ const App({ Key? key }) : super(key: key);
   Widget build(BuildContext context){
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home:  HomePage(),
       theme:  ThemeData(
         primarySwatch: Colors.yellow
       ),

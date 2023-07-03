@@ -2,39 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:todo/pages/Home/components/todo_tile.dart';
 
 class TodoList extends StatefulWidget {
-  final List todoList;
+  final List tasks;
+  final void Function(int index) deleteTask;
+  final void Function(int index) changeTaskStatus;
 
-  const TodoList({Key? key, required this.todoList}) : super(key: key);
-
+  const TodoList(
+      {super.key,
+      required this.tasks,
+      required this.deleteTask,
+      required this.changeTaskStatus});
   @override
   State<TodoList> createState() => _TodoListState();
 }
 
 class _TodoListState extends State<TodoList> {
-  void onTap(int index) {
-    setState(() {
-      widget.todoList[index][1] = !widget.todoList[index][1];
-    });
-  }
-
-  void delete(int index) {
-    setState(() {
-      widget.todoList.removeAt(index);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: widget.todoList.length,
+      itemCount: widget.tasks.length,
       itemBuilder: (context, index) => TodoTile(
-        taskName: widget.todoList[index][0],
-        isCompleted: widget.todoList[index][1],
+        taskName: widget.tasks[index]['task'],
+        isCompleted: widget.tasks[index]['isComplete'],
         onChanged: (a) {
-          onTap(index);
+          widget.changeTaskStatus(index);
         },
         removeTask: (context) {
-          delete(index);
+          widget.deleteTask(index);
         },
       ),
     );
